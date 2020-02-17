@@ -157,10 +157,6 @@ pub trait MultihashDigest {
     ///
     /// Panics if the digest length is bigger than 2^32. This only happens for identity hasing.
     fn digest(data: &[u8]) -> Multihash;
-
-    //fn dyn_digest(&self, data: &[u8]) -> Multihash {
-    //    Self::digest(data)
-    //}
 }
 
 /// The `DynMultihashDigest` trait is a variant of the `MultihashDigest` that can be used as trait
