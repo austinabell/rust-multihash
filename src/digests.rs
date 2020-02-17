@@ -149,20 +149,6 @@ impl<'a> PartialEq<Multihash> for MultihashRef<'a> {
 /// The `MultihashDigest` trait specifies an interface common for all multihash functions.
 pub trait MultihashDigest {
     /// The Mutlihash byte value.
-    const CODE: Code;
-
-    /// Hash some input and return the digest.
-    ///
-    /// # Panics
-    ///
-    /// Panics if the digest length is bigger than 2^32. This only happens for identity hasing.
-    fn digest(data: &[u8]) -> Multihash;
-}
-
-/// The `DynMultihashDigest` trait is a variant of the `MultihashDigest` that can be used as trait
-/// object.
-pub trait DynMultihashDigest {
-    /// The Mutlihash byte value.
     fn code(&self) -> Code;
 
     /// Hash some input and return the digest.
@@ -171,15 +157,6 @@ pub trait DynMultihashDigest {
     ///
     /// Panics if the digest length is bigger than 2^32. This only happens for identity hasing.
     fn digest(&self, data: &[u8]) -> Multihash;
-}
-
-impl<T: MultihashDigest + ?Sized> DynMultihashDigest for T {
-    fn code(&self) -> Code {
-        Self::CODE
-    }
-    fn digest(&self, data: &[u8]) -> Multihash {
-        Self::digest(data)
-    }
 }
 
 /// Wraps a hash digest in Multihash with the given Mutlihash code.

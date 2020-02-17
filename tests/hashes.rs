@@ -25,14 +25,16 @@ fn custom_multihash_digest() {
     #[derive(Clone, Debug)]
     struct SameHash;
     impl MultihashDigest for SameHash {
-        const CODE: Code = Code::Custom(0x9999);
+        fn code(&self) -> Code {
+            Code::Custom(0x9999)
+        }
 
-        fn digest(_data: &[u8]) -> Multihash {
+        fn digest(&self, _data: &[u8]) -> Multihash {
             let data = b"alwaysthesame";
-            wrap(&Self::CODE, data)
+            wrap(&Self.code(), data)
         }
     }
 
-    let my_hash = SameHash::digest(b"abc");
+    let my_hash = SameHash.digest(b"abc");
     assert_eq!(my_hash.digest(), b"alwaysthesame");
 }

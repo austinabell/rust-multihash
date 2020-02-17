@@ -15,7 +15,7 @@ macro_rules! assert_encode {
     {$( $alg:ident, $data:expr, $expect:expr; )*} => {
         $(
             assert_eq!(
-                <$alg as MultihashDigest>::digest($data).into_bytes(),
+                $alg::digest($data).into_bytes(),
                 hex_to_bytes($expect),
                 "{:?} encodes correctly", $alg
             );
@@ -88,7 +88,7 @@ macro_rules! assert_roundtrip {
     ($( $alg:ident ),*) => {
         $(
             {
-                let hash: Vec<u8> = <$alg as MultihashDigest>::digest(b"helloworld").into_bytes();
+                let hash: Vec<u8> = $alg::digest(b"helloworld").into_bytes();
                 assert_eq!(
                     MultihashRef::from_slice(&hash).unwrap().algorithm(),
                     $alg::CODE
@@ -107,7 +107,7 @@ fn assert_roundtrip() {
 }
 
 /// Testing the public interface of `Multihash` and `MultihashRef`
-fn test_methods(hash: impl DynMultihashDigest, prefix: &str, digest: &str) {
+fn test_methods(hash: impl MultihashDigest, prefix: &str, digest: &str) {
     let expected_bytes = hex_to_bytes(&format!("{}{}", prefix, digest));
     let multihash = hash.digest(b"hello world");
     assert_eq!(
@@ -204,7 +204,7 @@ fn multihash_methods() {
 fn test_long_identity_hash() {
     // A hash with a length bigger than 0x80, hence needing 2 bytes to encode the length
     let input = b"abcdefghijklmnopqrstuvwxyz abcdefghijklmnopqrstuvwxyz abcdefghijklmnopqrstuvwxyz abcdefghijklmnopqrstuvwxyz abcdefghijklmnopqrstuvwxyz abcdefghijklmnopqrstuvwxyz";
-    let multihash = <Identity as MultihashDigest>::digest(input);
+    let multihash = Identity::digest(input);
     assert_eq!(multihash.digest().to_vec(), input.to_vec());
 }
 
