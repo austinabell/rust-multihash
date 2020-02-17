@@ -1,26 +1,21 @@
-use multihash::{wrap, Code, ImplementedCode, Multihash, MultihashDigest, Sha3_512};
+use multihash::{wrap, Code, Multihash, MultihashDigest, Sha3_512};
 
 #[test]
 fn to_u64() {
-    assert_eq!(Code::Implemented(ImplementedCode::Keccak256).to_u64(), 0x1b);
+    assert_eq!(Code::Keccak256.to_u64(), 0x1b);
     assert_eq!(Code::Custom(0x1234).to_u64(), 0x1234);
 }
 
 #[test]
 fn from_u64() {
-    assert_eq!(
-        Code::from_u64(0xb220),
-        Code::Implemented(ImplementedCode::Blake2b256)
-    );
+    assert_eq!(Code::from_u64(0xb220), Code::Blake2b256);
     assert_eq!(Code::from_u64(0x0011_2233), Code::Custom(0x0011_2233));
 }
 
 #[test]
 fn hasher() {
     let expected = Sha3_512::digest(b"abcdefg");
-    let hasher = Code::Implemented(ImplementedCode::Sha3_512)
-        .hasher()
-        .unwrap();
+    let hasher = Code::Sha3_512.hasher().unwrap();
     assert_eq!(hasher.digest(b"abcdefg"), expected);
     assert!(Code::Custom(0x2222).hasher().is_none());
 }
