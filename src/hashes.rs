@@ -5,7 +5,7 @@ use sha1::Sha1 as Sha1Hasher;
 use sha2::{Sha256, Sha512};
 use tiny_keccak::{Hasher, Keccak, Sha3};
 
-use crate::digests::{wrap, Multihash, MultihashDigest};
+use crate::digests::{wrap, DynMultihashDigest, Multihash, MultihashDigest};
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum Code {
@@ -82,6 +82,40 @@ impl Code {
             0xB250 => Code::Implemented(ImplementedCode::Blake2s128),
             0xB260 => Code::Implemented(ImplementedCode::Blake2s256),
             _ => Code::Custom(code),
+        }
+    }
+
+    /// Return the hasher that is used to create a hash with this code.
+    ///
+    /// If a custom code is used, `None` is returned.
+    pub fn hasher(&self) -> Option<Box<dyn DynMultihashDigest>> {
+        match *self {
+            Self::Custom(_) => None,
+            Self::Implemented(code) => Some(code.hasher()),
+        }
+    }
+}
+
+impl ImplementedCode {
+    /// Return the Multihash implementation that does the actual hashing
+    fn hasher(self) -> Box<dyn DynMultihashDigest> {
+        match self {
+            ImplementedCode::Identity => Box::new(Identity),
+            ImplementedCode::Sha1 => Box::new(Sha1),
+            ImplementedCode::Sha2_256 => Box::new(Sha2_256),
+            ImplementedCode::Sha2_512 => Box::new(Sha2_512),
+            ImplementedCode::Sha3_224 => Box::new(Sha3_224),
+            ImplementedCode::Sha3_256 => Box::new(Sha3_256),
+            ImplementedCode::Sha3_384 => Box::new(Sha3_384),
+            ImplementedCode::Sha3_512 => Box::new(Sha3_512),
+            ImplementedCode::Keccak224 => Box::new(Keccak224),
+            ImplementedCode::Keccak256 => Box::new(Keccak256),
+            ImplementedCode::Keccak384 => Box::new(Keccak384),
+            ImplementedCode::Keccak512 => Box::new(Keccak512),
+            ImplementedCode::Blake2b256 => Box::new(Blake2b256),
+            ImplementedCode::Blake2b512 => Box::new(Blake2b512),
+            ImplementedCode::Blake2s128 => Box::new(Blake2s128),
+            ImplementedCode::Blake2s256 => Box::new(Blake2s256),
         }
     }
 }
